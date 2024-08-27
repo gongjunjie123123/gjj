@@ -91,5 +91,25 @@ struct msg_des {
 };
 
 
+pcie protocol:		PCIE协议分析软件
+qdir10.99:			多文件夹阅读
+beyond_compare:		xx
+source_insight:		xx
+notepad++:			xx
+xcap.exe:				发送报文软件
+iperf:				打流性能工具
+everything:			查找文件工具
+run-scapy:			linux 发包工具：	sendp(xx)
+
+
+
+memory_region_init_io:				不分配内存(mmap)：	vm-exit:	call qemu注册的模拟函数：call ioctl：下发到内核态：
+memory_region_init_ram_device_ptr:	要分配内存(mmap:qemu.va)：	直接写内存PA:	通过qemu.va map的hpa:	写数据到DDR ：	
+init_ram:		这个类似于iommu：	直接写数据到device：	写gpa->hva->hpa:	这样就写入ddr了
+
+
+
+vfio_pci_config_write():		ioctl 到 host kern
+vfio_pci_config_read():		ioctl 到 host kern
 
 
