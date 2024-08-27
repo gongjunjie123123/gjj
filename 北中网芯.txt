@@ -1,0 +1,95 @@
+
+
+
+PCIE1
+rr 0x6c01034 = 0x44 pcie ltenssn
+wr 0x6e000b0 = (0xa <<16) msix count
+wr 0x6e000b4 = 0x1004 bar4 msix-table
+wr 0x6e000b8 = 0x9004 bar4 pba pending 
+
+查看pcie bar4 地址:	 		lspci -vvv -s 1:0.0
+msix table start: 			pcie bar4 start addr + 0x1000
+pba start:					pcie bar4 start addr + 0x9000
+
+
+pci_enable_msix_range:		 获取中断个数...kern挂死...表示PCIE dma读取返回错误
+....pci_conf1_read:			msix_capability_init .. get_vm_area_caller ..kern dead
+mbus...fw_no_os:		 出现pf[8].pf_id=0 ... pf[8].ft=0 ... ft=1..L2nic .. ft=2 ..virtio..
+
+
+host= pf_id>>3 & 0x1:		 ... lpf=0-7 ..
+MSIX_PBA0
+
+pcie..capability:		 ..pm_offset=0x40 .. vpd=0xd0 .. pcie=0x70 ..msix=0xb0 ..aer=0x100 ..sriov=0x210 ..
+
+mbus bar4 0x25280 bit8= csr2 ready  	bit12=csr3_ready
+csr2_ready host set 1 			mcpu write 1 clear..
+csr3_ready mcpu set 1 			host write 1 clear..
+
+
+
+
+
+int ioeventfd_in_range(struct _ioeventfd *p, gpa_t addr, int len, void *val) {
+	if (addr > p->addr || addr < p->addr)
+		return 0;
+	if (addr+len >= p->addr+p->len || addr+len < p->addr)
+		return 0;
+		
+	return 1;
+}
+
+int ioeventfd_write(struct kvm_io_device *this, gpa_t addr, int len, void *val) {
+	struct _ioeventfd *p = to_ioeventfd(this);
+	if (!ioeventfd_in_range(p, addr, len, val))
+		return -1;
+	
+	eventfd_signal(p->eventfd, 1);
+	return 0;
+}
+
+
+写操作造成VM-exit:		 	继续陷入 VMM模式进行处理..
+MMIO 陷入 EPT violation:	 处理流程...调用设备写函数...ioeventfd_write..
+PIO 直接走 IO 陷入...
+
+
+对于 device 访问的地址 是iova地址 经过iommu 转换为 HPA
+qemu mmap 得到 hva, 给定一个iova  再经过dma_map(iova, hva) 建立映射 
+cpu 使用hva 		device 使用iova 
+qemu已经在 iova_tree 添加了 GPA & HVA的map
+
+VFIO_IOMMU_MAP_DMA：	 就是把 iova ->iommu ->hva ->mmu->hpa
+iova：	 	是 device 发起 dma 请求需要访问的地址 iommu->hpa
+
+IOMMU:		主要实现 dma & intr remap ...
+no-iommu:	dma & intr no-remap:	直接访问hpa..
+中断 remap: 	intr post投递：	中断隔离：
+virtio:		que_intf:		que_size:	que_msix_vector:	
+		:	que_enable:		que_desc_l:		que_desc_h
+
+
+virtio:		get_pf_resource:	get_status:		set_vq_addr
+			:set_drv_feature:	set_vq_msix:	set_vq_enable
+
+
+struct msix_entry *pp:		 = kcalloc(4, sizeof(*pp), GFP_KERNEL);
+for(i = 0; i < 4; i++)
+	pp[i].entry:		 	= i;
+int vec_num:			 	= pci_enable_msix_range(pdev, pp, 1, 4);
+int irq:					 = pp[0].vector;
+request_irq:				(irq, hand_isr, 0, "irq_xx", in_para);
+
+
+
+struct msg_des {
+	uint32_t bb;
+	union {
+		uint8_t rv[24];
+		struct aa ck;
+	} para;
+};
+
+
+
+
