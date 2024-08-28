@@ -113,3 +113,28 @@ vfio_pci_config_write():		ioctl 到 host kern
 vfio_pci_config_read():		ioctl 到 host kern
 
 
+
+rgmii-12:				100Mps:							主机设置100M
+dbell-bar4:				0x11000:						修改到 0x0
+rr 0x1c100060:			全0xfffffff:					修改为 0
+
+
+rr 0xa841020:			l2nic rx/tx dbell_num
+rr 0xa8810e0:			dbell sche_out sq/rq_num:		xx
+rr 0xa881000:			dbell sche_in sq/rq_num:		xx
+rr 0x8007134:			dma rcv msix_num
+rr 0x1c002760:			ig_rx_pktnum:					0x2760:		port12
+rr 0x1c012760:			eg_tx_pktnum:					0x12760:	port12
+rr 0x1c121490:			fcu rx_num
+rr 0xa802000:			virito mem_trace
+tereq 0 0 3:			打印np发送api buf
+fp 0 10 7:				np fpaddr 对照微码查看版本地址
+rr 0x7000110:			fp core0
+rr 0x1c120070:			np busy
+rr 0x1c1014d0:			green area res
+rr 0xa880800:			db ram_init
+rr 0x1c101000:			mmu sop/eop num
+
+
+
+
