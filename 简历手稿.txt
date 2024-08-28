@@ -1,0 +1,137 @@
+
+
+
+北中网芯：
+
+网卡虚拟化：					vfio & virtio...物理网卡pf..
+
+dpu智能网卡：					.....可编程...微码...烧写到芯片....np...48core...
+cpu..UX920：					..riscv..openocd...虚拟机启动gdb...load...continue..
+npimage：						...np_load...virtio_np.c...固件启动load...指定的存储空间...
+
+
+################### 1
+固件编码：						....初始化..芯片..满足收发包基本配置..
+	
+【】：							注意微码 np_compile版本问题
+	
+uart..virito/L2nic引擎：			...load_npimage...dbell...mmu..fcu..ieg..dma..pcie...
+
+参考芯片设计文档：				...pcie..dma...LF2GF映射关系...1pf..63*vf..
+....涉及..dma：					..start_msi_num.....pf & vf..quenum + msi_num...
+.....pf.bdf + vf.offset：		 = vf.bdf...
+....sriov：						..vf..offset..stride..q..中断..引擎init..
+
+
+echo 3：					 	> /sys/bus/pci/devices/bdf/sriov_numvfs...先加载pf_drv...再加载vf_drv...
+
+......ie模块：					...rgmii...port12..初始化speed100M..
+
+
+################# 2 
+....L2nic驱动代码：						自主实现编码：
+...virito内核通用驱动：					vdpa_dev接口
+	...根据芯片差异：					..提供标准接口..vq_addr(desc_addr, avail_addr, used_addr)：	msix接口：	kick:	dbell接口等...
+	
+	【】L2nic 上板环境验证基础功能 ok..
+	【】virito 上板验证基础功能 ok...
+	【】仿真环境已经验证 L2NIC pf ok 
+	【】推进仿真到 virtio-vdpa & vfio-pci.. vf.的验证工作.
+	
+....qemu...kvm:							...虚拟机启动...
+....驱动编码:							...与固件mbus交互...获取quenum...msix_callback接口:		下发que_addr:	msixid:		到引擎.....
+pf vring_tx/rx..资源分配:				...skbuf...dma_map..dma_addr..填充描述符...
+...ethdev_alloc:						...ethdev_ops...qid..敲dbell发包:		通知chip:		mmu-alloc(addr2):		取描述符(addr1)..
+
+
+
+
+############## 3 
+ 在仿真环境下：			  				芯片回片前  提前验证vfio...特性..提前预防 发现芯片问题...
+ 
+	【】更贴近真实使用场景的验证
+	【】验证部门 单一功能点的验证
+ 
+ vfio-pci：							移植代码到用户态...验证环境搭建在userspace...pci_cfg/bar4 _read/write...
+ 封装dpi_read/wr：					...tlp报文...访问pcie设备...
+ 包括pcidev scan：					...也是在用户态实现...模拟scan的pdev  需要自己创建 pdev device文件..vendor..device..resource..
+ 仿真环境fpga版本：					使用设计人员的fpga版本跑仿真
+ open("/dev/vfio/vfio"):			  模拟 ctnr fd
+ open("/dev/vfio/26"):				 模拟 group_fd
+ get_dev_fd:						模拟 dev_fd
+ 
+....dpdk：							启动依赖...拦截系统接口...LD_PRELOAD...
+__libc_start_main：					...open...ioctl...pread/write...bar4_read/write....
+....vfio：							iommu...支持多msix...expose..dma..
+....uio：							不支持iommu...不支持dma...
+...dpdk..drivers..net：				把kern drv 移植到 dpdk net 下即可...
+
+
+
+
+===========================================
+=====================================
+新华三：
+
+...给基站L1/L2/L3/业务组 提供运行平台...
+
+	【】跟单板设计人员对齐 单板器件--与CPU连接的接口...排查器件的型号..cpld版本等
+
+小型基站单板驱动:		--外围低速spi/iic/mdio/  
+						...mge..1000M 管理网卡phy配置...
+						...高速serdes.（预加重...prbs打流）..
+						....业务网卡...fpga...版本管理加载...gpio..模拟jtag烧写时序...
+						....fpga-pci read/write接口实现...sfp在位检测(iic)...sfp速率识别/切换..
+						..pwm风扇调速...
+						...cpld...挂接重启信号..iic信号..版本A/B/C相关的信息等...
+						...用户态驱动...互斥..fpga.....cpld...
+					
+
+
+===========================================
+=====================================
+德科：
+
+	给华为做基带仿真代码重构--BBH-3BBL..单板环境受限--每次代码修改后..  
+	...需要在仿真环境保证之前的CI 看护的功能都通过才能上库...
+	
+	【】C/C++ 类/vector 踩了一些坑(x86 arm环境  变量定义未初始化的差异 导致CI 用例不过等问题)
+	
+	
+	...当然新增的功能点开发和CI用例的增加也是我来维护...
+	
+	
+
+===========================================
+=====================================
+瑞斯康达：
+	
+	用broadcom & marvel 芯片开发交换机 vlan 相关的功能 
+	
+	
+		【】2款芯片 sdk接口差异较大... 适配接口理解上存在偏差..
+	
+	
+		端口加入vlan 只有相同vlan的端口才能通信
+		
+		mac + vlan + port 
+		
+		使用芯片sdk接口 进行增删查改等接口封装
+		
+		提供对应的cmdline..
+		
+		cfm 控制报文 --调用 sdk 接口产生 管理报文 （A 设备 ->...->X设备）
+		
+		根据报文内容分析哪个中间设备出故障
+		
+		
+		
+	
+	
+
+
+	
+
+
+
+

@@ -1,20 +1,28 @@
 
 
 
+vdpa.c:		vdpa_sim.c:		vdpa_sim_net.c:		vringh.c:		iotbl.c:	
+vdpa_host:			virtio_vdpa:	
+makef-dpdk:			自己实现dpdk makefile:		drivers & dpdk_lib:	
+
+
+
+
 PCIE1
-rr 0x6c01034 = 0x44 pcie ltenssn
-wr 0x6e000b0 = (0xa <<16) msix count
-wr 0x6e000b4 = 0x1004 bar4 msix-table
-wr 0x6e000b8 = 0x9004 bar4 pba pending 
+rr 0x6c01034 = 0x44:			 pcie ltenssn
+wr 0x6e000b0 = (0xa <<16):		 msix count
+wr 0x6e000b4 = 0x1004:			 bar4 msix-table
+wr 0x6e000b8 = 0x9004:			 bar4 pba pending 
+
 
 查看pcie bar4 地址:	 		lspci -vvv -s 1:0.0
 msix table start: 			pcie bar4 start addr + 0x1000
 pba start:					pcie bar4 start addr + 0x9000
 
 
-pci_enable_msix_range:		 获取中断个数...kern挂死...表示PCIE dma读取返回错误
-....pci_conf1_read:			msix_capability_init .. get_vm_area_caller ..kern dead
-mbus...fw_no_os:		 出现pf[8].pf_id=0 ... pf[8].ft=0 ... ft=1..L2nic .. ft=2 ..virtio..
+pci_enable_msix_range:		 获取中断个数...kern挂死...PCIE dma读取返回错误
+....pci_conf1_read:			msix_capability_init .. get_vm_area_caller:		kern dead
+mbus...fw_no_os:		 	出现pf[8].pf_id=0 ... pf[8].ft=0:	 ft=1:	L2nic:	 ft=2:	virtio:	
 
 
 host= pf_id>>3 & 0x1:		 ... lpf=0-7 ..

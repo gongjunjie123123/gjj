@@ -43,7 +43,7 @@ void vfio_pr(int lvl, char *fmt, ...) {
 	vsprintf(log, fmt, args);
 	va_end(args);
 	
-	sprintf(buf, "%s:%s", g_vfio_loglvl[lvl].lvl_str, log);
+	sprintf(buf, "%s:%s", g_vfio_loglvl[lvl].inf, log);
 	sprintf(fname, "%s/%s", g_vfio_log_path, "vfio.log");
 	fp = fopen(fname, "a+");
 	if (fp == 0) {
