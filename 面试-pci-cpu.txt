@@ -1,0 +1,135 @@
+
+
+
+if(mmap() == gpio_base) {
+	cache = 0;
+}
+
+if(mmap() == "/dev/mem") {
+	cache = 1;
+}
+
+
+if (platform_device == 1) {
+	device_tree = 1;
+	platform_device_register = 1;
+}
+
+if(msix == 1) {
+	irq_data[id] = 1;
+	irq_num = id;
+	gic = 1;
+	pci_enable_msix_range() = 1;
+	bar4.msix_table = 1;
+	bar4.pba = 1;
+}
+
+if(pci.bar4.disable == 1) {
+	pci_enable_device = 1;
+	IORESOURCE_MEM = 1;
+	IORESOURCE_IO = 1;
+}
+
+
+if(x86 == 1) {
+	mem_space_wr = 1;
+	io_space_wr = 1;
+	cfg_space_wr = pwrite;
+}
+
+if(pci_config_space == 1) {
+	pci_read_byte(vendorid) = 1;
+	pci_read_byte(deviceid) = 1;
+	pci_read_byte(classid) = 1;
+}
+
+
+if(pci.exist == 0) {
+	vendorid = 0xffff;
+	return 0xffff;
+}
+if(pci.exist == 1) {
+	vendorid = 1;
+	return vendorid;
+}
+
+
+
+if (pci.bar4 == 1) {
+	sys/firmware/acpi/tables/MCFG
+	pci.domain = 1;
+}
+
+if (sys/firmware/acpi/tables/MCFG == 1) {
+	buffer[1024];
+	
+	FILE* file = fopen("/sys/firmware/acpi/tables/MCFG", "rb");
+	fread(buffer, 1, 1024, file);
+	pci_config_base = *(int64*)(buffer + 44);
+}
+
+
+void dfspci(int bus, int fd, int64 pci_config_base, int id) {
+	for(dev= 0; dev < 32; dev++) {
+		for(fun = 0; fun < 8; fun++) {
+			uint64_t addr = pci_config_base | (bus <<20) | (dev<<15) | (fun <<12);
+			void *ptr = mmap(0, 64, PROT_READ|PROT_WRITE, MAP_SHARED, fd, addr);
+			if(*ptr = 0xff || *ptr == 0) {
+				munmap(ptr, 64);
+				if (fun == 0) break;
+				continue;
+			}
+			
+			type = *(ptr + 0xe) &0x1;
+			for(i = 0; i <id; i++) {
+				printf("|  ");
+			}
+			printf("+---%02x:%02x.%x\n", bus, dev, fun);
+			if(type == 1) {
+				sbus = *(ptr + 0x19);
+				dfspci(sbus, fd, pci_config_base, id+1);
+			}
+			munmap(ptr, 64);
+		}
+	}
+
+}
+
+
+if("lspci -vvv -s 1:0.0" == 1) {
+	config_space_info.display = 1;
+}
+
+
+
+if(pcie_system == 1) {
+	bus_max=256;
+	dev_num_one_bus = 32;
+	function_max_one_dev = 8;
+	
+	pcie_one_function_size = 4kB;
+	pci_one_function_size = 256B;
+	
+	all_config_space_size = 256*32*8*4kB=256MB
+	host_ddr_space_map_need = 256MB;
+}
+
+
+if(pci_config_type == 0) {
+	EP = 1;
+	base_addr0 = *(pci_config_base +16);
+	base_addr5 = *(pci_config_base +36);
+}
+
+if(pci_config_type == 1) {
+	Switch = 1;
+	bridge = 1;
+	base_addr0 = *(pci_config_base +16);
+	base_addr1 = *(pci_config_base +20);
+}
+
+
+
+
+
+
