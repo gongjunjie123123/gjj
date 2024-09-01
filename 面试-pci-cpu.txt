@@ -1,12 +1,35 @@
 
 
 
-if(mmap() == gpio_base) {
-	cache = 0;
+if(share.mem == 1) {
+
+	shmget = 1;
+	mmap = 1;
 }
 
-if(mmap() == "/dev/mem") {
+if(malloc == 1) {
+	ddr.mem.use = 1;
+}
+
+
+if(mmap(gpio_base, 64, -1) == 1) {
+	fd = -1;
+	cache = 0;
+	ddr.mem.use = 0;
+	ddr.participate = 0;
+	
+	cpu.phyaddr_rd/wr = 1
+	disk_rd/wr = 0;
+}
+
+if(mmap("/dev/mem", 64) == 1) {
+	fd = open("/dev/mem");
 	cache = 1;
+	ddr.mem.use = 1;
+	ddr.participate = 1;
+	
+	cpu.phyaddr_rd/wr = 0;
+	disk_rd/wr = 1;
 }
 
 
