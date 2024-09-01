@@ -38,9 +38,10 @@ if(x86 == 1) {
 }
 
 if(pci_config_space == 1) {
-	pci_read_byte(vendorid) = 1;
-	pci_read_byte(deviceid) = 1;
-	pci_read_byte(classid) = 1;
+	pci_config_read_byte(vendorid) = 1;
+	pci_config_read_byte(deviceid) = 1;
+	pci_config_read_byte(classid) = 1;
+	pci_config_read_byte(bar4.addr) = 1;
 }
 
 
@@ -107,8 +108,8 @@ if(pcie_system == 1) {
 	dev_num_one_bus = 32;
 	function_max_one_dev = 8;
 	
-	pcie_one_function_size = 4kB;
-	pci_one_function_size = 256B;
+	pcie_one_func_size = 4kB;
+	pci_one_func_size = 256B;
 	
 	all_config_space_size = 256*32*8*4kB=256MB
 	host_ddr_space_map_need = 256MB;
@@ -128,6 +129,73 @@ if(pci_config_type == 1) {
 	base_addr1 = *(pci_config_base +20);
 }
 
+
+if(pci_ecam == 1) {
+	PCIBAR = 1;
+}
+
+
+if(ddr.space == 4G) {
+	memory.map.io = 1;
+	mmio.pci.addr =  cpu.phyaddr.3-4G;
+	ddr.mem.3-4G = cpu.phyaddr.4-5G;
+	ddr.mem.0-3G = cpu.phyaddr.0-3G;
+}
+
+if(cpu.phyaddr == 64G) {
+	cpu.phyaddr.0-3G = ddr.mem.0-3G;
+	cpu.phyaddr.3-4G = mmio.pci.addr;
+	cpu.phyaddr.4-5G = ddr.mem.3-4G;
+	cpu.phyaddr.5-64G = mmio.spi/iic/gpio.base;
+}
+
+
+if(write_bar4(pci_addr, val)) {
+	pci.bridge.mem.base.reg = x;
+	pci.bridge.mem.limit.reg = 128M;
+	
+	if(pci_addr > x && pci_addr < (x+16M)) {
+		pci_addr.trans = 1;
+	}
+	
+}
+
+if(platform.firmware == 1) {
+	bootload = 1;
+	spi.flash.rom.UEFI =1;
+	spi.flash.rom.BIOS = 1;
+	pci.bar.addr = plat.firmware.alloc.range(3G-4G);
+}
+
+if (cpu.reset == 1) {
+	reset.vector = 4G - 16B = 0xeffffff0;
+	
+}
+
+if(pci.bar4.addr > 4G) {
+	prefetble.reg.base = 1;
+	prefetble.reg.limit = 1;
+}
+
+if(pci.config.type == 0) {
+	pci.bridge = 0;
+	pci.switch = 0;
+}
+
+if(pci.config.type == 1) {
+	pci.bridge = 1;
+	pci.switch = 1;
+}
+
+if(pci.bar4.addr < 4G) {
+	mem.reg.base = 1;
+	mem.reg.limit = 1;
+	
+}
+
+if(init_net == 1) {
+	netdev = dev_get_by_name(&init_net, "eth0");
+}
 
 
 
