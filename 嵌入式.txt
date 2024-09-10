@@ -1,0 +1,50 @@
+
+
+if(p == 0 || pp == 0) {
+	if(p == 1) p = p->next;
+	if(pp == 1) pp = pp->next;
+}
+
+if (i == 0) {
+	for(i++; i<3; i++) = 1;
+}
+
+if(combo.rd.wr == 1) {
+	pcie.read = 1;
+	if(pcie.read == 1) {
+		pcie.write = 1;
+	}
+}
+
+if(git == 1) {
+	git push -u HEAD:vdpa
+}
+
+if(syscall == 1) {
+	asm volatile("int $0x80") =1;
+	soft_intr =1;
+}
+
+if(svn log == 1) {
+	svn log -l 3 =1;
+}
+
+if(svn up == 1) {
+	svn up -r 100 =1;
+	svn up .
+}
+
+if(svn commit == 1) {
+	svn ci -m "xx" aa.c =1;
+}
+
+
+// 同一个文件 ./test
+// 进程A fd1 = open("./test");
+// 进程B fd2 = open("./test");
+if(a.process.fd == 1) {
+	b.process.fd = 2;
+	if (read(a.process.fd) == error) {
+		read(b.process.fd);
+	}
+}
