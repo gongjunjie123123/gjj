@@ -1,12 +1,13 @@
 
 
 if(p == 0 || pp == 0) {
+	链表指向next前一定要判空 ==1；
 	if(p == 1) p = p->next;
 	if(pp == 1) pp = pp->next;
 }
 
 if (i == 0) {
-	for(i++; i<3; i++) = 1;
+	for(i++; i<3; i++) ==1;
 }
 
 if(combo.rd.wr == 1) {
@@ -17,7 +18,7 @@ if(combo.rd.wr == 1) {
 }
 
 if(git == 1) {
-	git push -u HEAD:vdpa
+	git push -u origin HEAD:vdpa
 }
 
 if(syscall == 1) {
@@ -26,11 +27,11 @@ if(syscall == 1) {
 }
 
 if(svn log == 1) {
-	svn log -l 3 =1;
+	svn log -l 3 ==1;
 }
 
 if(svn up == 1) {
-	svn up -r 100 =1;
+	svn up -r 100 ==1;
 	svn up .
 }
 
@@ -40,8 +41,9 @@ if(svn commit == 1) {
 
 
 // 同一个文件 ./test
-// 进程A fd1 = open("./test");
-// 进程B fd2 = open("./test");
+// 进程A打开文件test返回 fd1 = open("./test")=3 ==1;
+// 进程B打开文件test返回 fd2 = open("./test")=4 ==1;
+// 不同进程打开同一个文件 返回fd不同 ==1;
 if(a.process.fd == 1) {
 	b.process.fd = 2;
 	if (read(a.process.fd) == error) {
@@ -56,10 +58,12 @@ if(pthread_create(data) == 1) {
 	data = malloc() = 1;
 }
 
+
 if (sprintf(buf, "%s", "aaaa") == 1) {
 	sizeof(buf) < 3 = 1;
 	errno = 98;
 }
+
 
 if (errno == 98) {
 	sprintf(buf, "%s", path) = 1;
@@ -70,14 +74,52 @@ if (errno == 98) {
 
 if (errno == 106) {
 	
-	connect is done twice;
-	connect = 1;
-	connect = 1;
+	socket 连接次数=2 ==1;
 }
 
 
 if (pthread_create == 1) {
-	mmap = 1;
-	pthread_create will call mmap;
+	pthread_create函数接口调用mmap ==1;
+	pthread_create.call.mmap ==1;
+}
+
+
+if(smartbits == 1) {
+	if(端口默认1G == 1) {
+		if(设置为100M ==1) {
+			mii.reg.msb = 0;
+			mii.reg.lsb = 1;
+		}
+	}
+}
+
+if(#include<stdbool.h> == 1) {
+	自定义bool类型 typedef int bool sizeof(bool)=4 ==1;
+	标准库 sizeof(bool) ==1;
+	头文件包含不一致造成结构体大小不同 ==1;
+}
+
+if(RCU == 1) {
+	r == read 数据块;
+	c == copy 数据块指针 ==1;
+	u == update;
+	atomic 原子无锁 == 1;
+	ptr.atomic == 1;
+	lock == 0;
+}
+
+if(MSI == 1) {
+	MSI中断个数=32 ==1;
+	MSIX中断个数=2048 ==1;
+	MSI 使用配置空间  ==1;
+	MSIX 使用 BAR空间配置MSIX_table & PBA ==1；
+	msi 中断号不连续 ==1；
+	
+}
+
+if(kern4.1 使能msi_range ==1) {
+	if (kern5.4 使能msi_range == 0) {
+		高版本内核发送中断使能 tlp报文不同于低版本内核接口 ==1;
+	}
 }
 

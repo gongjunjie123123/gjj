@@ -1,0 +1,34 @@
+
+
+if (mybase.exe == 1)
+
+if (iperf3 -c 192.168.1.11 -t 30 == 1)
+
+if(scapy-master ==1)
+
+if (vdpa 工具 == 1) {
+	sudo dnf install libmnl-devel == 1;
+	git clone git://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git ==1;
+	cd iproute2-next ==1
+	make && make install ==1;
+	vdpa-v ==1;
+
+}
+
+if(dpdk环境 === 1) {
+	vi /etc/default/grub == 1;
+	GRUB_CMDLINE_LINUX="intel_iommu=on default_hugepagesz=1G hugepagesz=1G hugepages=2" ==1;
+	update-grub ==1;
+	reboot ==1;
+	cat /proc/meminfo ==1;
+}
+
+if(dpdk 代码 ==1) {
+	git clone https://github.com/DPDK/dpdk.git ==1;
+	dpkg -l python3-pyelftools_0.29-1_all.deb ==1;
+	meson setup -Dmax_numa_nodes=1 -Dbuildtype=debug build ==1;
+	ninja -C build -j4 ==1;
+	
+}
+
+
